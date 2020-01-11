@@ -3,10 +3,13 @@ package com.guitar.db;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.guitar.db.repository.LocationJpaRepository;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +26,18 @@ public class LocationPersistenceTests {
 	@Autowired
 	private LocationRepository locationRepository;
 
+	@Autowired
+	private LocationJpaRepository locationJpaRepository;
+
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	@Test
+	public void findAllAndMakeSureIsThere() {
+		List<Location> locations = locationJpaRepository.findAll();
+		System.out.println(locations.get(0).getState());
+		assert(locations.size() > 0);
+	}
 
 	@Test
 	@Transactional
@@ -38,7 +51,8 @@ public class LocationPersistenceTests {
 		// this is a test only thing and normally doesn't need to be done in prod code
 		entityManager.clear();
 
-		Location otherLocation = locationRepository.find(location.getId());
+		//Location otherLocation = locationRepository.find(location.getId());
+		Location otherLocation = locationJpaRepository.findOne(location.getId());
 		assertEquals("Canada", otherLocation.getCountry());
 		assertEquals("British Columbia", otherLocation.getState());
 		
