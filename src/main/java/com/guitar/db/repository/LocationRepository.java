@@ -56,9 +56,7 @@ public class LocationRepository {
 				.createQuery("select l from Location l where l.state like :state")
 				.setParameter("state", name + "%").getResultList();
 
-		for (Location loc : locs) {
-			System.out.println( loc.getCountry() + loc.getState() + loc.getId().toString());
-		}
+
 		return locs;
 	}
 }

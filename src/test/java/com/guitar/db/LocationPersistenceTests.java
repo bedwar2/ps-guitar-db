@@ -45,11 +45,11 @@ public class LocationPersistenceTests {
 		Location location = new Location();
 		location.setCountry("Canada");
 		location.setState("British Columbia");
-		location = locationRepository.create(location);
+		location = locationJpaRepository.saveAndFlush(location);
 		
 		// clear the persistence context so we don't return the previously cached location object
 		// this is a test only thing and normally doesn't need to be done in prod code
-		entityManager.clear();
+		//entityManager.clear();
 
 		//Location otherLocation = locationRepository.find(location.getId());
 		Location otherLocation = locationJpaRepository.findOne(location.getId());
@@ -57,12 +57,18 @@ public class LocationPersistenceTests {
 		assertEquals("British Columbia", otherLocation.getState());
 		
 		//delete BC location now
-		locationRepository.delete(otherLocation);
+		//locationRepository.delete(otherLocation);
+		locationJpaRepository.delete(otherLocation);
 	}
 
 	@Test
 	public void testFindWithLike() throws Exception {
 		List<Location> locs = locationRepository.getLocationByStateName("New");
+		for (Location loc : locs) {
+			System.out.println( loc.getCountry() + loc.getState() + loc.getId().toString());
+		}
+
+
 		assertEquals(4, locs.size());
 	}
 
