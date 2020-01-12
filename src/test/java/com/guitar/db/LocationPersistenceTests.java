@@ -18,13 +18,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.guitar.db.model.Location;
-import com.guitar.db.repository.LocationRepository;
 
 @ContextConfiguration(locations={"classpath:com/guitar/db/applicationTests-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class LocationPersistenceTests {
-	@Autowired
-	private LocationRepository locationRepository;
 
 	@Autowired
 	private LocationJpaRepository locationJpaRepository;
@@ -63,19 +60,36 @@ public class LocationPersistenceTests {
 
 	@Test
 	public void testFindWithLike() throws Exception {
-		List<Location> locs = locationRepository.getLocationByStateName("New");
+		List<Location> locs = locationJpaRepository.findByStateLike("New%");  //locationRepository.getLocationByStateName("New");
 		for (Location loc : locs) {
 			System.out.println( loc.getCountry() + loc.getState() + loc.getId().toString());
 		}
 
-
 		assertEquals(4, locs.size());
+
+		locs = locationJpaRepository.findByStateStartingWithIgnoreCase("Ma");
+		assertEquals(3, locs.size());
+	}
+
+	@Test
+	public void testFindNotLike() throws Exception {
+		List<Location> locs = locationJpaRepository.findByStateNotLikeOrderByStateAsc("New%");  //locationRepository.getLocationByStateName("New");
+		for (Location loc : locs) {
+			System.out.println( loc.getCountry() + loc.getState() + loc.getId().toString());
+		}
+
+		locs.forEach((location -> {
+			System.out.println(location.getState());
+		}));
+
+		assertEquals(46, locs.size());
+
 	}
 
 	@Test
 	@Transactional  //note this is needed because we will get a lazy load exception unless we are in a tx
 	public void testFindWithChildren() throws Exception {
-		Location arizona = locationRepository.find(3L);
+		Location arizona = locationJpaRepository.findOne(3L);
 		assertEquals("United States", arizona.getCountry());
 		assertEquals("Arizona", arizona.getState());
 		
@@ -83,4 +97,21 @@ public class LocationPersistenceTests {
 		
 		assertEquals("Fender Musical Instruments Corporation", arizona.getManufacturers().get(0).getName());
 	}
+
+	@Test
+	public void testByStateOrCountry() {
+		List<Location> locations = locationJpaRepository.findByStateOrCountry("Utah", "United States");
+
+		assertEquals(50, locations.size());
+
+	}
+
+	@Test
+	public void testByStateAndCountry() {
+		List<Location> locations = locationJpaRepository.findByStateAndCountry("Utah", "United States");
+
+		assertEquals(1, locations.size());
+		assertEquals("Utah", locations.get(0).getState());
+	}
+
 }

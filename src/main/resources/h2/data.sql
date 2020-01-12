@@ -3,6 +3,8 @@ delete modeltype;
 delete manufacturer;
 delete location;
 
+--alter table manufacturer add column active boolean not null;
+
 insert into location (id, country, state) values (1, 'United States', 'Alabama');
 insert into location (id, country, state) values (2, 'United States', 'Alaska');
 insert into location (id, country, state) values (3, 'United States', 'Arizona');
@@ -54,8 +56,8 @@ insert into location (id, country, state) values (48, 'United States', 'West Vir
 insert into location (id, country, state) values (49, 'United States', 'Wisconsin');
 insert into location (id, country, state) values (50, 'United States', 'Wyoming');
 
-insert into manufacturer (id, name, location_id, averageYearlySales, foundedDate) values (1, 'Fender Musical Instruments Corporation', 3, 25000000, '1946-01-01');
-insert into manufacturer (id, name, location_id, averageYearlySales, foundedDate) values (2, 'Gibson Guitar Corporation', 42, 32000000, '1902-01-01');
+insert into manufacturer (id, name, location_id, averageYearlySales, foundedDate, active) values (1, 'Fender Musical Instruments Corporation', 3, 25000000, '1946-01-01',true);
+insert into manufacturer (id, name, location_id, averageYearlySales, foundedDate, active) values (2, 'Gibson Guitar Corporation', 42, 32000000, '1902-01-01',false);
 
 insert into modeltype (id, name) values (1, 'Dreadnought Acoustic');
 insert into modeltype (id, name) values (2, 'Nylon String Acoustic');

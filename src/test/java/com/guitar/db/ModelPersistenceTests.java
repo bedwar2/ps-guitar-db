@@ -1,14 +1,14 @@
 package com.guitar.db;
 
-import static org.junit.Assert.assertEquals;
-
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import com.guitar.db.repository.ModelJpaRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.guitar.db.model.Model;
 import com.guitar.db.repository.ModelRepository;
 
+import static org.junit.Assert.*;
+
 @ContextConfiguration(locations={"classpath:com/guitar/db/applicationTests-context.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ModelPersistenceTests {
 	@Autowired
 	private ModelRepository modelRepository;
+
+	@Autowired
+	private ModelJpaRepository jpaRepo;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -67,5 +72,24 @@ public class ModelPersistenceTests {
 	public void testGetModelsByType() throws Exception {
 		List<Model> mods = modelRepository.getModelsByType("Electric");
 		assertEquals(4, mods.size());
+	}
+
+	@Test
+	public void findAllAcoustic() {
+		List<String> modelTypes = new ArrayList<>();
+		modelTypes.add("Dreadnought Acoustic");
+		modelTypes.add("Nylon String Acoustic");
+		modelTypes.add("Acoustic Electric");
+		List<Model> mods = jpaRepo.findByModelTypeNameIn(modelTypes);
+		System.out.println("Total Recs: " + mods.size());
+		assertNotNull(mods);
+
+		mods.forEach((model) -> {
+			System.out.println(model.getModelType().getName());
+			assertTrue(model.getModelType().getName().equals("Dreadnought Acoustic")
+				|| model.getModelType().getName().equals("Nylon String Acoustic")
+				|| model.getModelType().getName().equals("Acoustic Electric")
+			);
+		});
 	}
 }
