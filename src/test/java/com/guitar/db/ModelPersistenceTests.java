@@ -12,6 +12,7 @@ import com.guitar.db.repository.ModelJpaRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +47,7 @@ public class ModelPersistenceTests {
 		
 		// clear the persistence context so we don't return the previously cached location object
 		// this is a test only thing and normally doesn't need to be done in prod code
-		entityManager.clear();
+		//entityManager.clear();
 
 		Model otherModel = modelRepository.find(m.getId());
 		assertEquals("Test Model", otherModel.getName());
@@ -54,6 +55,8 @@ public class ModelPersistenceTests {
 		
 		//delete BC location now
 		modelRepository.delete(otherModel);
+
+		jpaRepo.aCustomMethod();
 	}
 
 	@Test
@@ -64,8 +67,13 @@ public class ModelPersistenceTests {
 
 	@Test
 	public void testGetModelsByPriceRangeAndWoodType() throws Exception {
-		List<Model> mods = modelRepository.getModelsByPriceRangeAndWoodType(BigDecimal.valueOf(1000L), BigDecimal.valueOf(2000L), "Maple");
-		assertEquals(3, mods.size());
+		Page<Model> mods = modelRepository.getModelsByPriceRangeAndWoodType(BigDecimal.valueOf(1000L), BigDecimal.valueOf(2000L), "Maple");
+		mods.forEach((model -> {
+			System.out.println(model.getName());
+		}));
+		assertEquals(2, mods.getSize());
+
+		System.out.println("Size = " + mods.getSize());
 	}
 
 	@Test
@@ -91,5 +99,12 @@ public class ModelPersistenceTests {
 				|| model.getModelType().getName().equals("Acoustic Electric")
 			);
 		});
+	}
+
+	@Test
+	public void TestModelCount() {
+		Long count = modelRepository.getModelCount();
+		assertTrue(count > 0);
+		System.out.println("Total Count: " + count);
 	}
 }
